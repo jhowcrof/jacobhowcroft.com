@@ -12,6 +12,14 @@ var bg_ctx = background.getContext("2d");
 var ctx = buffer.getContext("2d");
 var final_ctx = canvas.getContext("2d");
 
+// Audio
+var snow_sounds = new Array(new Audio("audio/cold.mp3"), new Audio(
+		"audio/cold.mp3"), new Audio("audio/cold.mp3"), new Audio(
+		"audio/cold.mp3"));
+var fire_sounds = new Array(new Audio("audio/hot.mp3"), new Audio(
+		"audio/hot.mp3"), new Audio("audio/hot.mp3"),
+		new Audio("audio/hot.mp3"));
+
 // Images
 var logo = new Image();
 logo.src = "images/dunbeer.png";
@@ -100,13 +108,16 @@ function main() {
 	bg_ctx.drawImage(bg, 0, 0);
 	ctx.font = "24pt Monospace";
 	var main_interval = setInterval("update()", 30);
-	var makeballs = setInterval(function() {
-		if (document.hasFocus()) {
-			//console.log("new ball @ " + (new Date()).getTime());
-			snowballs.push(new snowball(Math.round(Math.random() * (814 - 45))));
-			fireballs.push(new fireball(Math.round(Math.random() * (814 - 45))));
-		}
-	}, 750);
+	var makeballs = setInterval(
+			function() {
+				if (document.hasFocus()) {
+					// console.log("new ball @ " + (new Date()).getTime());
+					snowballs.push(new snowball(Math.round(Math.random()
+							* (814 - 45))));
+					fireballs.push(new fireball(Math.round(Math.random()
+							* (814 - 45))));
+				}
+			}, 750);
 }
 
 function ssplash() {
@@ -136,7 +147,7 @@ function update() {
 			framerate = 1000 / ((end - start) / 10);
 		}
 
-		if((time++) % 5 == 0){
+		if ((time++) % 5 == 0) {
 			score++;
 		}
 		// Update
@@ -158,7 +169,7 @@ function update() {
 		drawClock();
 		ctx.fillStyle = "#000";
 		ctx.fillText(temp, 920, 100);
-		//ctx.fillText(framerate, 950, 300);
+		// ctx.fillText(framerate, 950, 300);
 		ctx.fillStyle = "#FFF";
 		ctx.fillText(score, 1000, canvas.height - 25 - clock.height / 2);
 		final_ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -233,6 +244,9 @@ function checkCollisions() {
 				&& ball.x - 5 < bucket + bucket_bottom.width / 2) {
 			// catch ball
 			temp--;
+			var s = snow_sounds.shift(); 
+			s.play();
+			snow_sounds.push(s);
 			for ( var j = 0; j < particles; j++) {
 				snowparticles.push(new snowparticle2());
 			}
@@ -268,6 +282,9 @@ function checkCollisions() {
 				&& ball.x - 5 < bucket + bucket_bottom.width / 2) {
 			// catch ball
 			temp++;
+			var s = fire_sounds.shift(); 
+			s.play();
+			fire_sounds.push(s);
 			for ( var j = 0; j < particles; j++) {
 				fireparticles.push(new fireparticle2());
 			}
