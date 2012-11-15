@@ -15,16 +15,7 @@
 </head>
 <body>
 <div class="page">
-<div class="header">
-<h1>Jacob Howcroft</h1>
-</div>
-<ul class="nav">
-	<li class="nav"><a class="nav_el" href="index.html">Home</a></li>
-	<li class="nav"><a class="nav_el" href="games.html">Games</a></li>
-	<!-- <li class="nav"><a class="nav_el" href="index.html">Projects</a></li> -->
-	<li class="nav"><a class="nav_el" href="files/Resume_JHowcroft_2012.pdf">Resume</a></li>
-</ul>
-<hr>
+<?php include('header.php'); ?>
 <div class="content">
 <p>These are a couple of browser games I have made with a friend of mine, under the name Dunebear.  Both are still works in progress.
 <ul>
