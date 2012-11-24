@@ -16,9 +16,16 @@ var final_ctx = canvas.getContext("2d");
 var snow_sounds = new Array(new Audio("audio/cold.mp3"), new Audio(
 		"audio/cold.mp3"), new Audio("audio/cold.mp3"), new Audio(
 		"audio/cold.mp3"));
+
 var fire_sounds = new Array(new Audio("audio/hot.mp3"), new Audio(
 		"audio/hot.mp3"), new Audio("audio/hot.mp3"),
 		new Audio("audio/hot.mp3"));
+
+var crash_sounds = new Array(new Audio("audio/pop.mp3"), new Audio(
+		"audio/pop.mp3"), new Audio("audio/pop.mp3"),
+		new Audio("audio/pop.mp3"));
+
+console.log("Audio files loaded");
 
 // Images
 var logo = new Image();
@@ -35,6 +42,16 @@ var bucket_bottom = new Image();
 bucket_bottom.src = "images/pipe_b.png";
 var clock = new Image();
 clock.src = "images/ticktock.png";
+var thermometer = new Image();
+thermometer.src = "images/meter.png";
+var greenlight = new Image();
+greenlight.src = "images/greenlight.png";
+var yellowlight = new Image();
+yellowlight.src = "images/yellowlight.png";
+var redlight = new Image();
+redlight.src = "images/redlight.png";
+var glare = new Image();
+glare.src = "images/tubeglare.png";
 
 // Variables
 var mouse = {
@@ -48,7 +65,6 @@ var snowballs = new Array();
 var fireparticles = new Array();
 var snowparticles = new Array();
 var bucket = 0;
-var temp = 70;
 var gravity = -1;
 var particles = 20;
 var clock_rotation = 0;
@@ -56,9 +72,41 @@ var frame_count = 0;
 var start = 0;
 var end = 0;
 var framerate = 0;
-var score = 0;
-var time = 0;
+var dropHealth = true;
+var drawHealth = true;
 
+var gameintervals = {
+	logo_interval : 0,
+	main_interval : 0,
+	makeballs_interval : 0,
+	danger_interval : 0,
+	clear : function() {
+		clearInterval(this.logo_interval);
+		clearInterval(this.main_interval);
+		clearInterval(this.makeballs_interval);
+		console.log("clearing interval");
+		clearInterval(this.danger_interval);
+	}
+};
+
+var gamedata = {
+	time : 0,
+	score : 0,
+	health : 241,
+	target : 70,
+	temp : 70,
+	state : 0,
+	reset : function() {
+		this.time = 0;
+		this.score = 0;
+		this.health = 241;
+		this.target = 70;
+		this.temp = 70;
+		this.state = 0;
+	}
+};
+
+canvas.addEventListener('mousemove', getMousePos, false);
 ssplash();
 
 function fireball(pos) {
@@ -104,11 +152,12 @@ function fireparticle2() {
 }
 
 function main() {
-	canvas.addEventListener('mousemove', getMousePos, false);
+	bg_ctx.drawImage(bg, 0, 0);
+	bg_ctx.drawImage(bg, 0, 0);
 	bg_ctx.drawImage(bg, 0, 0);
 	ctx.font = "24pt Monospace";
-	var main_interval = setInterval("update()", 30);
-	var makeballs = setInterval(
+	gameintervals.main_interval = setInterval("update()", 30);
+	gameintervals.makeballs_interval = setInterval(
 			function() {
 				if (document.hasFocus()) {
 					// console.log("new ball @ " + (new Date()).getTime());
@@ -120,11 +169,25 @@ function main() {
 			}, 750);
 }
 
+function endgame() {
+	gamedata.reset();
+	gameintervals.clear();
+	drawHealth = true;
+	dropHealth = true;
+	while (snowballs.length > 0) {
+		snowballs.pop();
+	}
+	while (fireballs.length > 0) {
+		fireballs.pop();
+	}
+	ssplash();
+}
+
 function ssplash() {
 	window.focus();
-	var logo_interval = setInterval("drawLogo()", 30);
+	gameintervals.logo_interval = setInterval("drawLogo()", 30);
 	setTimeout(function() {
-		clearInterval(logo_interval);
+		clearInterval(gameintervals.logo_interval);
 		main();
 	}, 3000);
 }
@@ -147,9 +210,36 @@ function update() {
 			framerate = 1000 / ((end - start) / 10);
 		}
 
-		if ((time++) % 5 == 0) {
-			score++;
+		if ((gamedata.time++) % 5 == 0) {
+			gamedata.score++;
 		}
+
+		if (dropHealth
+				&& (gamedata.temp > gamedata.target + 1 || gamedata.temp < gamedata.target - 1)) {
+			gamedata.health--;
+			if (gamedata.health == 60) {
+				console.log("setting danger interval");
+				gameintervals.danger_interval = setInterval(function() {
+					drawHealth = !drawHealth;
+				}, 250);
+
+			}
+			dropHealth = !dropHealth;
+			setTimeout(function() {
+				dropHealth = !dropHealth;
+			}, 500 / (2 * Math.abs(gamedata.temp - gamedata.target)));
+		}
+
+		if (Math.abs(gamedata.temp - gamedata.target) > 1)
+			gamedata.state = 2;
+		else if (Math.abs(gamedata.temp - gamedata.target) > 0)
+			gamedata.state = 1;
+		else
+			gamedata.state = 0;
+		if (gamedata.health <= 0) {
+			endgame();
+		}
+
 		// Update
 		updateSnow();
 		updateFire();
@@ -167,14 +257,37 @@ function update() {
 		drawParticles();
 		drawBucketBottom();
 		drawClock();
-		ctx.fillStyle = "#000";
-		ctx.fillText(temp, 920, 100);
-		// ctx.fillText(framerate, 950, 300);
-		ctx.fillStyle = "#FFF";
-		ctx.fillText(score, 1000, canvas.height - 25 - clock.height / 2);
+		if (drawHealth)
+			drawLight();
+		drawHealthBar();
+		drawText();
+
 		final_ctx.clearRect(0, 0, canvas.width, canvas.height);
 		final_ctx.drawImage(buffer, 0, 0);
 	}
+}
+
+function drawLight() {
+	switch (gamedata.state) {
+	case 0:
+		ctx.drawImage(greenlight, 1049, 143);
+		break;
+	case 1:
+		ctx.drawImage(yellowlight, 1064, 143);
+		break;
+	case 2:
+		ctx.drawImage(redlight, 1079, 143);
+		break;
+	}
+}
+
+function drawText() {
+	ctx.fillStyle = "#000";
+	ctx.fillText(gamedata.temp, 920, 100);
+	ctx.fillText(gamedata.target, 980, 100);
+	// ctx.fillText(framerate, 950, 300);
+	ctx.fillStyle = "#FFF";
+	ctx.fillText(gamedata.score, 1000, canvas.height - 25 - clock.height / 2);
 }
 
 function drawClock() {
@@ -183,6 +296,16 @@ function drawClock() {
 	ctx.rotate(clock_rotation);
 	ctx.drawImage(clock, -clock.width / 2, -clock.height / 2);
 	ctx.restore();
+}
+
+function drawHealthBar() {
+
+	ctx.drawImage(thermometer, 965, 200);
+	ctx.fillStyle = "#F20000";
+	ctx.fillRect(965 + 19, 200 + 11 + (241 - gamedata.health), 26,
+			250 - (241 - gamedata.health));
+	ctx.drawImage(glare, 965, 200);
+
 }
 
 function updateParticles() {
@@ -209,12 +332,15 @@ function updateParticles() {
 function drawParticles() {
 	ctx.fillStyle = "#57BDEB";
 	for ( var i = 0; i < snowparticles.length; i++) {
+		ctx.globalAlpha = Math.random() * .5 + .5;
 		ctx.fillRect(snowparticles[i].x, snowparticles[i].y, 5, 5);
 	}
 	ctx.fillStyle = "#FFBD00";
 	for ( var i = 0; i < fireparticles.length; i++) {
+		ctx.globalAlpha = Math.random();
 		ctx.fillRect(fireparticles[i].x, fireparticles[i].y, 5, 5);
 	}
+	ctx.globalAlpha = 1;
 }
 
 function checkCollisions() {
@@ -225,6 +351,9 @@ function checkCollisions() {
 				&& ball.x + 5 < bucket - bucket_bottom.width / 2
 				&& (ball.x + fire.width) > bucket - bucket_bottom.width / 2) {
 			// break ball
+			var s = crash_sounds.shift();
+			s.play();
+			crash_sounds.push(s);
 			for ( var j = 0; j < particles; j++) {
 				snowparticles.push(new snowparticle(ball.x + fire.width / 2,
 						ball.y + fire.height / 2));
@@ -234,6 +363,9 @@ function checkCollisions() {
 				&& (ball.x) < bucket + bucket_bottom.width / 2
 				&& (ball.x + fire.width - 5) > bucket + bucket_bottom.width / 2) {
 			// break ball
+			var s = crash_sounds.shift();
+			s.play();
+			crash_sounds.push(s);
 			for ( var j = 0; j < particles; j++) {
 				snowparticles.push(new snowparticle(ball.x + fire.width / 2,
 						ball.y + fire.height / 2));
@@ -243,8 +375,8 @@ function checkCollisions() {
 				&& ball.x + 5 > bucket - bucket_bottom.width / 2
 				&& ball.x - 5 < bucket + bucket_bottom.width / 2) {
 			// catch ball
-			temp--;
-			var s = snow_sounds.shift(); 
+			gamedata.temp--;
+			var s = snow_sounds.shift();
 			s.play();
 			snow_sounds.push(s);
 			for ( var j = 0; j < particles; j++) {
@@ -263,6 +395,9 @@ function checkCollisions() {
 				&& ball.x + 5 < bucket - bucket_bottom.width / 2
 				&& (ball.x + fire.width) > bucket - bucket_bottom.width / 2) {
 			// break ball
+			var s = crash_sounds.shift();
+			s.play();
+			crash_sounds.push(s);
 			for ( var j = 0; j < particles; j++) {
 				fireparticles.push(new fireparticle(ball.x + fire.width / 2,
 						ball.y + fire.height / 2));
@@ -272,6 +407,9 @@ function checkCollisions() {
 				&& (ball.x) < bucket + bucket_bottom.width / 2
 				&& (ball.x + fire.width - 5) > bucket + bucket_bottom.width / 2) {
 			// break ball
+			var s = crash_sounds.shift();
+			s.play();
+			crash_sounds.push(s);
 			for ( var j = 0; j < particles; j++) {
 				fireparticles.push(new fireparticle(ball.x + fire.width / 2,
 						ball.y + fire.height / 2));
@@ -281,8 +419,8 @@ function checkCollisions() {
 				&& ball.x + 5 > bucket - bucket_bottom.width / 2
 				&& ball.x - 5 < bucket + bucket_bottom.width / 2) {
 			// catch ball
-			temp++;
-			var s = fire_sounds.shift(); 
+			gamedata.temp++;
+			var s = fire_sounds.shift();
 			s.play();
 			fire_sounds.push(s);
 			for ( var j = 0; j < particles; j++) {

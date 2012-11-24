@@ -136,8 +136,10 @@ function endScreen() {
 
 function drawStart() {
 	ctx.drawImage(splash, 0, 0);
-	if (blink)
+	if (blink) {
+	ctx.fillStyle = '#111111';
 		ctx.fillRect(250, 375, 475, 90);
+	}
 	ctx.save();
 	ctx.translate(511, 108);
 	ctx.rotate(splashSpin += 5 * Math.PI / 180);
@@ -197,6 +199,9 @@ function endgame() {
 	while (particles_blood.length > 0) {
 		particles_blood.pop();
 	}
+	while (stars.length > 0) {
+		stars.pop();	
+	} 
 	player.x = 0;
 	player.y = 0;
 	score = 0;
