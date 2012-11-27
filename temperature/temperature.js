@@ -84,7 +84,6 @@ var gameintervals = {
 		clearInterval(this.logo_interval);
 		clearInterval(this.main_interval);
 		clearInterval(this.makeballs_interval);
-		console.log("clearing interval");
 		clearInterval(this.danger_interval);
 	}
 };
@@ -96,6 +95,8 @@ var gamedata = {
 	target : 70,
 	temp : 70,
 	state : 0,
+	difficulty : 750,
+	flashtext : false,
 	reset : function() {
 		this.time = 0;
 		this.score = 0;
@@ -103,6 +104,8 @@ var gamedata = {
 		this.target = 70;
 		this.temp = 70;
 		this.state = 0;
+		this.difficulty = 750;
+		this.flashtext = false;
 	}
 };
 
@@ -128,6 +131,7 @@ function snowparticle(x, y) {
 	this.y = y;
 	this.dx = -5 + Math.random() * 10;
 	this.dy = Math.random() * -5 - 5;
+	this.alpha = 1.0;
 }
 
 function fireparticle(x, y) {
@@ -135,6 +139,7 @@ function fireparticle(x, y) {
 	this.y = y;
 	this.dx = -5 + Math.random() * 10;
 	this.dy = Math.random() * -5 - 5;
+	this.alpha = 1.0;
 }
 
 function snowparticle2() {
@@ -142,6 +147,7 @@ function snowparticle2() {
 	this.y = canvas.height;
 	this.dx = -3 + Math.random() * 5;
 	this.dy = Math.random() * -10 - 10;
+	this.alpha = 1.0;
 }
 
 function fireparticle2() {
@@ -149,24 +155,68 @@ function fireparticle2() {
 	this.y = canvas.height;
 	this.dx = -3 + Math.random() * 5;
 	this.dy = Math.random() * -10 - 10;
+	this.alpha = 1.0;
 }
 
 function main() {
 	bg_ctx.drawImage(bg, 0, 0);
 	bg_ctx.drawImage(bg, 0, 0);
 	bg_ctx.drawImage(bg, 0, 0);
-	ctx.font = "24pt Monospace";
+	ctx.font = "30pt Monospace";
 	gameintervals.main_interval = setInterval("update()", 30);
-	gameintervals.makeballs_interval = setInterval(
-			function() {
-				if (document.hasFocus()) {
-					// console.log("new ball @ " + (new Date()).getTime());
-					snowballs.push(new snowball(Math.round(Math.random()
-							* (814 - 45))));
-					fireballs.push(new fireball(Math.round(Math.random()
-							* (814 - 45))));
-				}
-			}, 750);
+	gameintervals.makeballs_interval = setInterval("makeballs()",
+			gamedata.difficulty);
+	setTimeout("changetarget()", 10000);
+}
+
+function changetarget() {
+	var r = Math.random();
+	var timeout = Math.random() * 10000 + 3000;
+	if (r < 0.4) {
+		gamedata.target--;
+		flashText();
+		setTimeout("changetarget()", timeout);
+	} else if (r >= 0.4 && r < 0.5) {
+		gamedata.target--;
+		setTimeout(function() {
+			gamedata.target--;
+			flashText();
+			setTimeout("changetarget()", timeout);
+		}, 1000);
+	} else if (r >= 0.5 && r < 0.6) {
+		gamedata.target++;
+		setTimeout(function() {
+			gamedata.target++;
+			flashText();
+			setTimeout("changetarget()", timeout);
+		}, 1000);
+	} else if (r >= 0.6) {
+		gamedata.target++;
+		flashText();
+		setTimeout("changetarget()", timeout);
+	}
+}
+
+function flashText() {
+	gamedata.flashtext = true;
+	setTimeout(function() {
+		gamedata.flashtext = false;
+		setTimeout(function() {
+			gamedata.flashtext = true;
+			setTimeout(function() {
+				gamedata.flashtext = false;
+			}, 500);
+		}, 500);
+	}, 500);
+
+}
+
+function makeballs() {
+	if (document.hasFocus()) {
+		// console.log("new ball @ " + (new Date()).getTime());
+		snowballs.push(new snowball(Math.round(Math.random() * (814 - 45))));
+		fireballs.push(new fireball(Math.round(Math.random() * (814 - 45))));
+	}
 }
 
 function endgame() {
@@ -282,12 +332,19 @@ function drawLight() {
 }
 
 function drawText() {
+	ctx.save();
+	ctx.shadowColor = "#FFF";
+	ctx.shadowBlur = 10;
 	ctx.fillStyle = "#000";
-	ctx.fillText(gamedata.temp, 920, 100);
-	ctx.fillText(gamedata.target, 980, 100);
+	ctx.fillText(gamedata.temp, 930, 97);
+	if (gamedata.flashtext) {
+		ctx.fillStyle = "#FFF";
+	}
+	ctx.fillText(gamedata.target, 1030, 97);
 	// ctx.fillText(framerate, 950, 300);
 	ctx.fillStyle = "#FFF";
 	ctx.fillText(gamedata.score, 1000, canvas.height - 25 - clock.height / 2);
+	ctx.restore();
 }
 
 function drawClock() {
@@ -313,6 +370,9 @@ function updateParticles() {
 		var p = snowparticles.shift();
 		if (p.y > canvas.height || p.x < 0 || p.x > canvas.width)
 			continue;
+		p.alpha -= (Math.random() * .05 + .001);
+		if (p.alpha <= 0.0)
+			continue;
 		p.x += p.dx;
 		p.y += p.dy;
 		p.dy -= gravity;
@@ -321,6 +381,9 @@ function updateParticles() {
 	for ( var i = 0; i < fireparticles.length; i++) {
 		var p = fireparticles.shift();
 		if (p.y > canvas.height || p.x < 0 || p.x > canvas.width)
+			continue;
+		p.alpha -= (Math.random() * .05 + .001);
+		if (p.alpha <= 0.0)
 			continue;
 		p.x += p.dx;
 		p.y += p.dy;
@@ -332,12 +395,12 @@ function updateParticles() {
 function drawParticles() {
 	ctx.fillStyle = "#57BDEB";
 	for ( var i = 0; i < snowparticles.length; i++) {
-		ctx.globalAlpha = Math.random() * .5 + .5;
+		ctx.globalAlpha = snowparticles[i].alpha;
 		ctx.fillRect(snowparticles[i].x, snowparticles[i].y, 5, 5);
 	}
 	ctx.fillStyle = "#FFBD00";
 	for ( var i = 0; i < fireparticles.length; i++) {
-		ctx.globalAlpha = Math.random();
+		ctx.globalAlpha = fireparticles[i].alpha;
 		ctx.fillRect(fireparticles[i].x, fireparticles[i].y, 5, 5);
 	}
 	ctx.globalAlpha = 1;
