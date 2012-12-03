@@ -1,5 +1,5 @@
 .page {
-	background-color: #DDD;
+	background-color: #6C89C8;
 	position: fixed;
 	left: 10%;
 	right: 10%;
@@ -7,24 +7,33 @@
 	bottom:50px;
 	padding: 1.5em;
 	font-family: Helvetica, Arial, sans-serif;
+	border: solid 5px;
+	border-color: #FFF;
+	box-shadow: 0px 0px 10px #FFF, 0px 0px 20px 1px #001541 inset;
 }
 
 .header {
-	color: #009;
+	color: #001541;
+	text-shadow: 0px 0px 10px #FFF;
 	font-weight: normal;
 	text-align: center;
 	font-family: Helvetica, Arial, sans-serif;
 }
 
 body {
-	background-color: #000;
-	color: #111;
+	background-color: #001541;
+	color: #000;
 	font-size: .85em; text-align : left;
 	align: center;
+	display: none;
 }
 
-a:link, a:visited {
-	color:#009;	
+a:link {
+	color:#FFF;	
+}
+
+a:visited {
+	color:#EEE;
 }
 
 .nav {
@@ -49,10 +58,26 @@ li.nav{
 }
 
 .nav_el:hover, .nav_el:active {
-	color: #009;
-	background-color: #FEC;	
+	color: #001541;
+	background-color: #FFF;	
+	text-shadow: 0px 0px 10px #001541;
+	cursor: default;
 }
 
-.content {
-	width: 500px;
+.nav_el_clicked, .nav_el_clicked:hover, .nav_el_clicked:active {
+	color: #FFF;
+	background-color: #001541;
+	text-shadow: 0px 0px 10px #FFF;
+}
+
+#gitfeed {
+	float:right;	
+}
+
+#games {
+	display: none;
+}
+
+#resume {
+	display: none;
 }
