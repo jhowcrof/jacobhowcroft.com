@@ -142,16 +142,16 @@ function fireparticle(x, y) {
 	this.alpha = 1.0;
 }
 
-function snowparticle2() {
-	this.x = bucket;
+function snowparticle2(x) {
+	this.x = x;
 	this.y = canvas.height;
 	this.dx = -3 + Math.random() * 5;
 	this.dy = Math.random() * -10 - 10;
 	this.alpha = 1.0;
 }
 
-function fireparticle2() {
-	this.x = bucket;
+function fireparticle2(x) {
+	this.x = x;
 	this.y = canvas.height;
 	this.dx = -3 + Math.random() * 5;
 	this.dy = Math.random() * -10 - 10;
@@ -356,13 +356,11 @@ function drawClock() {
 }
 
 function drawHealthBar() {
-
 	ctx.drawImage(thermometer, 965, 200);
 	ctx.fillStyle = "#F20000";
 	ctx.fillRect(965 + 19, 200 + 11 + (241 - gamedata.health), 26,
 			250 - (241 - gamedata.health));
 	ctx.drawImage(glare, 965, 200);
-
 }
 
 function updateParticles() {
@@ -410,7 +408,7 @@ function checkCollisions() {
 	for ( var i = 0; i < snowballs.length; i++) {
 		var ball = snowballs.shift();
 		// Hit edge
-		if (ball.y + fire.height > canvas.height - 81
+		if (ball.y + fire.height > canvas.height - bucket_bottom.height/2 + 5
 				&& ball.x + 5 < bucket - bucket_bottom.width / 2
 				&& (ball.x + fire.width) > bucket - bucket_bottom.width / 2) {
 			// break ball
@@ -422,7 +420,7 @@ function checkCollisions() {
 						ball.y + fire.height / 2));
 			}
 			continue;
-		} else if (ball.y + fire.height > canvas.height - 81
+		} else if (ball.y + fire.height > canvas.height - bucket_bottom.height/2 + 5
 				&& (ball.x) < bucket + bucket_bottom.width / 2
 				&& (ball.x + fire.width - 5) > bucket + bucket_bottom.width / 2) {
 			// break ball
@@ -434,7 +432,7 @@ function checkCollisions() {
 						ball.y + fire.height / 2));
 			}
 			continue;
-		} else if (ball.y > canvas.height - 73
+		} else if (ball.y > canvas.height - bucket_bottom.height/2
 				&& ball.x + 5 > bucket - bucket_bottom.width / 2
 				&& ball.x - 5 < bucket + bucket_bottom.width / 2) {
 			// catch ball
@@ -443,7 +441,7 @@ function checkCollisions() {
 			s.play();
 			snow_sounds.push(s);
 			for ( var j = 0; j < particles; j++) {
-				snowparticles.push(new snowparticle2());
+				snowparticles.push(new snowparticle2(ball.x + fire.width / 2));
 			}
 			continue;
 		}
@@ -454,7 +452,7 @@ function checkCollisions() {
 	for ( var i = 0; i < fireballs.length; i++) {
 		var ball = fireballs.shift();
 		// Hit edge
-		if (ball.y + fire.height > canvas.height - bucket_bottom.height
+		if (ball.y + fire.height > canvas.height - bucket_bottom.height/2 + 5
 				&& ball.x + 5 < bucket - bucket_bottom.width / 2
 				&& (ball.x + fire.width) > bucket - bucket_bottom.width / 2) {
 			// break ball
@@ -466,7 +464,7 @@ function checkCollisions() {
 						ball.y + fire.height / 2));
 			}
 			continue;
-		} else if (ball.y + fire.height > canvas.height - bucket_bottom.height
+		} else if (ball.y + fire.height > canvas.height - bucket_bottom.height/2 + 5
 				&& (ball.x) < bucket + bucket_bottom.width / 2
 				&& (ball.x + fire.width - 5) > bucket + bucket_bottom.width / 2) {
 			// break ball
@@ -478,7 +476,7 @@ function checkCollisions() {
 						ball.y + fire.height / 2));
 			}
 			continue;
-		} else if (ball.y > canvas.height - 73
+		} else if (ball.y > canvas.height - bucket_bottom.height/2
 				&& ball.x + 5 > bucket - bucket_bottom.width / 2
 				&& ball.x - 5 < bucket + bucket_bottom.width / 2) {
 			// catch ball
@@ -487,7 +485,7 @@ function checkCollisions() {
 			s.play();
 			fire_sounds.push(s);
 			for ( var j = 0; j < particles; j++) {
-				fireparticles.push(new fireparticle2());
+				fireparticles.push(new fireparticle2(ball.x + fire.width / 2));
 			}
 			continue;
 		}
@@ -497,16 +495,19 @@ function checkCollisions() {
 
 function updateBucket() {
 	bucket = mouse.x;
+	if(bucket + bucket_bottom.width/2 > 864) bucket = 864 - bucket_bottom.width/2;
+	else if(bucket - bucket_bottom.width/2 < 0) bucket = 0 + bucket_bottom.width/2;
+	
 }
 
 function drawBucketTop() {
 	ctx.drawImage(bucket_top, bucket - bucket_top.width / 2, canvas.height
-			- bucket_top.height);
+			- bucket_top.height/2);
 }
 
 function drawBucketBottom() {
 	ctx.drawImage(bucket_bottom, bucket - bucket_top.width / 2, canvas.height
-			- bucket_top.height);
+			- bucket_top.height/2);
 }
 
 function updateSnow() {

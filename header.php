@@ -8,6 +8,3 @@
 	<li class="nav"><span id="resumelink" class="nav_el">Resume</span></li>
 </ul>
 <hr>
-esume</a></li>
-</ul>
-<hr>
