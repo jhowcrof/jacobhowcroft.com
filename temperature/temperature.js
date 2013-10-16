@@ -274,9 +274,9 @@ function update() {
 				}, 250);
 
 			}
-			dropHealth = !dropHealth;
+			dropHealth = false;
 			setTimeout(function() {
-				dropHealth = !dropHealth;
+				dropHealth = true;
 			}, 500 / (2 * Math.abs(gamedata.temp - gamedata.target)));
 		}
 

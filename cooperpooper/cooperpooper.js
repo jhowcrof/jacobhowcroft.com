@@ -23,6 +23,29 @@ p1img.src = "images/dude_red.png";
 var p2img = new Image();
 p2img.src = "images/dude_yellow.png";
 
+// Maps
+var map = [
+	"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+	"--------\\XX/----------------------------",
+	"        [XX]                            ",
+	"        [XX]                            ",
+	"        [XX]                            ",
+	"        [XX]                            ",
+	"        <-->                            ",
+	"                                        ",
+	"                                        ",
+	"                            ,___________",
+	"                            <----\\XXXXXX",
+	"                                  \\XXXXX",
+	"                                   \\XXXX",
+	"                                    \\XXX",
+	"                                     \\XX",
+	"        ,_____.                      [XX",
+	"        [XXXXX]                      [XX",
+	"        [XXXXX]                      [XX",
+	"        [XXXXX]                      [XX",
+	"________(XXXXX)______________________(XX"
+];
 
 // Objects
 function Tile(type){
@@ -30,6 +53,7 @@ function Tile(type){
 	this.offx = type.x;
 	this.offy = type.y;
 	this.changeType = changeType;
+	this.alpha = 1.0
 	function changeType(type){
 		this.type = type;
 		this.offx = type.x;

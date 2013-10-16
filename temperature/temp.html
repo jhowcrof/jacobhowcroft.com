@@ -3,17 +3,22 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html;charet=ISO-8859-1" />
 <title>Dunebear Unlimited</title>
+<link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-	<canvas id="bg" width="1136" height="640"
-		style="cursor: none; position: absolute; z-index: 0">
-</canvas>
-	<canvas id="thecanvas" width="1136" height="640"
-		style="cursor: none; position: absolute; z-index: 1">
-</canvas>
+	<div id="candiv">
+		<canvas id="bg" width="1136" height="640"
+			style="cursor: none; position: absolute; z-index: 1">
+			Please upgrade to a modern browser.
+		</canvas>
+		<canvas id="thecanvas" width="1136" height="640"
+			style="cursor: none; position: absolute; z-index: 2">
+		</canvas>
+	</div>
+	<div id="instructions">
+		<p>Move the bucket with the mouse.  Watch the thermostat on the right.  Try to keep the temperature on the left the same as the target temperature on the right. The target temperature will randomly go up and down, so make sure to keep up.</p>
+		<p>If you are too far off of the target temp, your health will start to drop.  Try to last as long as you can!</p>
+	</div>
 	<script type="text/javascript" src="temperature.js"></script>
-
-
-
 </body>
 </html>
