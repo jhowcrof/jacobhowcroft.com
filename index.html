@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html ng-app="dunebear">
+<head>
+	<title>Jacob Howcroft</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<!-- Bootstrap -->
+	<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+	<link href="css/style.css" rel="stylesheet" media="screen">
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular-route.min.js"></script>
+</head>
+<body ng-controller="DunebearCtrl">
+	<div class="jh-banner">
+		<div class="container jh-banner-title">
+			<div class="row">
+				<div class="col-sm-9 col-md-5 col-md-offset-7 jh-banner-title-area">
+					<h1>Jacob Howcroft</h1>
+					<div class="row">
+						<div class="col-xs-3">
+							<a href="#/home">
+								<h3>Home</h3> 
+							</a>
+						</div>
+						<div class="col-xs-3">
+							<a href="#/games" id="">
+								<h3>Games</h3> 
+							</a>
+						</div>
+						<div class="col-xs-3">
+							<a href="#/about">
+								<h3>About</h3> 
+							</a>
+						</div>
+					</div>
+					<div ng-view class="row col-md-12 jh-content"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<script src="http://code.jquery.com/jquery.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/dunebear.js"></script>
+</body>
+</html>
